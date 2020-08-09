@@ -20,6 +20,7 @@
   ],
   "files": [
     "dist",
+    "types/index.d.ts",
     "LICENSE-WTFPL",
     "LICENSE-MIT",
     "package.json",
