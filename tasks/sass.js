@@ -12,6 +12,7 @@
 module.exports = function (grunt) {
   return {
     options: {
+      implementation: require('node-sass'),
       includePaths: ['<%= pkg.config.site %>/bower_components'],
       imagePath: '<%= pkg.config.site %>/images'
     },

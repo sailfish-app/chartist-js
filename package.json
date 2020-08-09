@@ -73,6 +73,7 @@
     "jshint-stylish": "^2.2.0",
     "load-grunt-config": "^0.19.2",
     "lodash": "^4.13.1",
+    "node-sass": "^4.14.1",
     "seed-random": "^2.2.0",
     "time-grunt": "^1.0.0",
     "typescript": "^3.9.7"
