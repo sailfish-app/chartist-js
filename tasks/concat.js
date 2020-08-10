@@ -18,6 +18,8 @@ module.exports = function (grunt) {
       },
       files: {
         '<%= pkg.config.dist %>/chartist.js': [
+          // TODO: Make these normal dependencies that Webpack can bundle.
+          'node_modules/kld-intersections/dist/index-umd.js',
           '<%= pkg.config.src %>/scripts/core.js',
           '<%= pkg.config.src %>/scripts/interpolation.js',
           '<%= pkg.config.src %>/scripts/event.js',

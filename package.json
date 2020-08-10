@@ -42,7 +42,9 @@
       "url": "https://github.com/gionkunz/chartist-js/blob/master/LICENSE-MIT"
     }
   ],
-  "dependencies": {},
+  "dependencies": {
+    "kld-intersections": "^0.7.0"
+  },
   "devDependencies": {
     "assemble-dox": "0.0.2",
     "dtslint": "^3.6.14",

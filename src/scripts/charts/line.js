@@ -12,6 +12,9 @@
   var window = globalRoot.window;
   var document = globalRoot.document;
 
+  var ShapeInfo = exports.ShapeInfo;
+  var Intersection = exports.Intersection;
+
   /**
    * Default options in line charts. Expand the code view to see a detailed list of options with comments.
    *
@@ -155,6 +158,8 @@
     if (options.showGridBackground) {
       Chartist.createGridBackground(gridGroup, chartRect, options.classNames.gridBackground, this.eventEmitter);
     }
+
+    var seriesPaths = {};
 
     // Draw the series
     data.raw.series.forEach(function(series, seriesIndex) {
@@ -309,7 +314,14 @@
           });
         }.bind(this));
       }
+
+      seriesPaths[series.name] = path;
+
     }.bind(this));
+
+    if (options.band) {
+      drawBand(seriesGroup, seriesPaths[options.band.top], seriesPaths[options.band.bottom]);
+    }
 
     this.eventEmitter.emit('created', {
       bounds: axisY.bounds,
@@ -319,6 +331,97 @@
       svg: this.svg,
       options: options
     });
+  }
+
+  function drawBand(seriesGroup, topPath, bottomPath) {
+    var seriesElement = seriesGroup.elem('g');
+
+    var topPathShape = ShapeInfo.path(topPath.stringify());
+    var bottomPathShape = ShapeInfo.path(bottomPath.stringify());
+    var intersections = Intersection.intersect(topPathShape, bottomPathShape);
+
+    if (!intersections.points) {
+      // handle this case!
+      return;
+    }
+
+    var topElements = topPath.pathElements;
+    var botElements = bottomPath.pathElements;
+
+    var topIndex = 0;
+    var botIndex = 0;
+
+    for (var i = 0; i < intersections.points.length; i++) {
+      var intersection = intersections.points[i];
+
+      var topSegment = [];
+      while (topIndex < topElements.length) {
+        var currTopElement = topElements[topIndex];
+        if (currTopElement.x > intersection.x) {
+          break;
+        }
+        topSegment.push(currTopElement);
+        topIndex++;
+      }
+
+      var botSegment = [];
+      while (botIndex < botElements.length) {
+        var currBotElement = botElements[botIndex];
+        if (currBotElement.x > intersection.x) {
+          break;
+        }
+        botSegment.push(currBotElement);
+        botIndex++;
+      }
+
+      var fillPath = new Chartist.Svg.Path();
+
+      // Draw the part of the band tracing the top series.
+      if (i > 0) {
+        var prevIntersection = intersections.points[i - 1];
+        fillPath.move(prevIntersection.x, prevIntersection.y);
+        fillPath.line(topSegment[0].x, topSegment[0].y);
+      } else {
+        fillPath.move(topSegment[0].x, topSegment[0].y);
+      }
+
+      for (var j = 1; j < topSegment.length; j++) {
+        fillPath.pathElements.push(topSegment[j]);
+        fillPath.pos++;
+      }
+
+      fillPath.line(intersection.x, intersection.y);
+
+      // Draw the part of the band tracing the bottom series.
+      fillPath.line(botSegment[botSegment.length - 1].x, botSegment[botSegment.length - 1].y);
+
+      for (var j = botSegment.length - 1; j >= 1; j--) {
+        var prevSegment = botSegment[j - 1];
+        fillPath.curve(botSegment[j].x2, botSegment[j].y2, botSegment[j].x1, botSegment[j].y1, prevSegment.x, prevSegment.y);
+      }
+
+      if (i > 0) {
+        // is there a cleaner way to describe what's happening here?
+        // we are using the end point of the last curve from the previous
+        // fillPath to determine the destination point of this (reverse) curve.
+        var prevSegment = botElements[botIndex - botSegment.length - 1];
+        fillPath.curve(botSegment[0].x2, botSegment[0].y2, botSegment[0].x1, botSegment[0].y1, prevSegment.x, prevSegment.y);
+
+        var prevIntersection = intersections.points[i - 1];
+        fillPath.line(prevIntersection.x, prevIntersection.y);
+      } else {
+        fillPath.line(topSegment[0].x, topSegment[0].y);
+      }
+
+      var color = topSegment[0].y > botSegment[0].y ? 'green' : 'red';
+
+      seriesElement.elem('path', {
+        fill: color,
+        d: fillPath.stringify()
+      });
+
+      // emit draw event maybe?
+    }
   }
 
   /**
