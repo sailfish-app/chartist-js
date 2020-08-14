@@ -413,6 +413,7 @@ declare namespace Chartist {
         height?: number | string;
         showLine?: boolean;
         showPoint?: boolean;
+        pointRadius?: number;
         showArea?: boolean;
         areaBase?: number;
         lineSmooth?: Function | boolean;
@@ -427,6 +428,7 @@ declare namespace Chartist {
                 lineSmooth?: Function | boolean;
                 showLine?: boolean;
                 showPoint?: boolean;
+                pointRadius?: number;
                 showArea?: boolean;
                 areaBase?: number;
             }
@@ -655,6 +657,11 @@ declare namespace Chartist {
         querySelectorAll(selector: string): any; // this returns an svg wrapper list in the docs, need to see if that's just an array or a special list
 
         /**
+         * Returns the underlying SVG node for the current element.
+         */
+        getNode(): Node;
+
+        /**
          * This method creates a foreignObject (see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject) that allows to embed HTML content into a SVG graphic. With the help of foreignObjects you can enable the usage of regular HTML elements inside of SVG where they are subject for SVG positioning and transformation but the Browser will use the HTML rendering capabilities for the containing DOM.
          */
         foreignObject(content: any, attributes?: Object, className?: string, insertFirst?: boolean): IChartistSvg;
@@ -812,6 +819,31 @@ declare namespace Chartist {
 
     interface IChartistStepInterpolationOptions extends IChartistInterpolationOptions {
         postpone?: boolean;
+    }
+
+    interface IAxisBounds {
+        high: number;
+        low: number;
+    }
+
+    interface IChartCreatedContext {
+        chartRect: IChartRect;
+        svg: IChartistSvg;
+        options: IChartOptions;
+    }
+
+    interface ILineChartCreatedContext extends IChartCreatedContext {
+        bounds: IAxisBounds;
+        axisX: IChartAxis;
+        axisY: IChartAxis;
+        options: ILineChartOptions;
+    }
+
+    interface IBarChartCreatedContext extends IChartCreatedContext {
+        bounds: IAxisBounds;
+        axisX: IChartAxis;
+        axisY: IChartAxis;
+        options: IBarChartOptions;
     }
 }
 

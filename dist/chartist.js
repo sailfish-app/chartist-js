@@ -3090,6 +3090,9 @@ var Chartist = {
     createGridAndLabels: createGridAndLabels,
     projectValue: function(value, index, data) {
       throw new Error('Base axis can\'t be instantiated!');
+    },
+    invert: function() {
+      throw new Error('Base axis can\'t be instantiated!');
     }
   });
 
@@ -3189,6 +3192,7 @@ var Chartist = {
       min: highLow.low,
       max: highLow.high
     };
+    this.rangeValue = this.range.max - this.range.min;
 
     Chartist.FixedScaleAxis.super.constructor.call(this,
       axisUnit,
@@ -3200,12 +3204,19 @@ var Chartist = {
   }
 
   function projectValue(value) {
-    return this.axisLength * (+Chartist.getMultiValue(value, this.units.pos) - this.range.min) / (this.range.max - this.range.min);
+    return this.axisLength * (+Chartist.getMultiValue(value, this.units.pos) - this.range.min) / this.rangeValue;
+  }
+
+  function invert(coord) {
+    const percent = (coord - this.chartRect[this.units.rectStart]) / this.axisLength;
+    const value = percent * this.rangeValue + this.range.min;
+    return value
   }
 
   Chartist.FixedScaleAxis = Chartist.Axis.extend({
     constructor: FixedScaleAxis,
-    projectValue: projectValue
+    projectValue: projectValue,
+    invert: invert
   });
 
 }(this || global, Chartist));
@@ -3324,6 +3335,8 @@ var Chartist = {
     showLine: true,
     // If dots should be drawn or not
     showPoint: true,
+    // Radius of points
+    pointRadius: 4,
     // If the line chart should draw an area
     showArea: false,
     // The base for the area chart that will be used to close the area shape (is normally 0)
@@ -3443,6 +3456,7 @@ var Chartist = {
       var seriesOptions = {
         lineSmooth: Chartist.getSeriesOption(series, options, 'lineSmooth'),
         showPoint: Chartist.getSeriesOption(series, options, 'showPoint'),
+        pointRadius: Chartist.getSeriesOption(series, options, 'pointRadius'),
         showLine: Chartist.getSeriesOption(series, options, 'showLine'),
         showArea: Chartist.getSeriesOption(series, options, 'showArea'),
         areaBase: Chartist.getSeriesOption(series, options, 'areaBase')
@@ -3460,11 +3474,10 @@ var Chartist = {
       if (seriesOptions.showPoint) {
 
         path.pathElements.forEach(function(pathElement) {
-          var point = seriesElement.elem('line', {
-            x1: pathElement.x,
-            y1: pathElement.y,
-            x2: pathElement.x + 0.01,
-            y2: pathElement.y
+          var point = seriesElement.elem('circle', {
+            cx: pathElement.x,
+            cy: pathElement.y,
+            r: seriesOptions.pointRadius
           }, options.classNames.point).attr({
             'ct:value': [pathElement.data.value.x, pathElement.data.value.y].filter(Chartist.isNumeric).join(','),
             'ct:meta': Chartist.serialize(pathElement.data.meta)

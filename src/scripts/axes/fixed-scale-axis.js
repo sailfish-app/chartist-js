@@ -37,6 +37,7 @@
       min: highLow.low,
       max: highLow.high
     };
+    this.rangeValue = this.range.max - this.range.min;
 
     Chartist.FixedScaleAxis.super.constructor.call(this,
       axisUnit,
@@ -48,12 +49,19 @@
   }
 
   function projectValue(value) {
-    return this.axisLength * (+Chartist.getMultiValue(value, this.units.pos) - this.range.min) / (this.range.max - this.range.min);
+    return this.axisLength * (+Chartist.getMultiValue(value, this.units.pos) - this.range.min) / this.rangeValue;
+  }
+
+  function invert(coord) {
+    const percent = (coord - this.chartRect[this.units.rectStart]) / this.axisLength;
+    const value = percent * this.rangeValue + this.range.min;
+    return value
   }
 
   Chartist.FixedScaleAxis = Chartist.Axis.extend({
     constructor: FixedScaleAxis,
-    projectValue: projectValue
+    projectValue: projectValue,
+    invert: invert
   });
 
 }(this || global, Chartist));

@@ -111,6 +111,9 @@
     createGridAndLabels: createGridAndLabels,
     projectValue: function(value, index, data) {
       throw new Error('Base axis can\'t be instantiated!');
+    },
+    invert: function() {
+      throw new Error('Base axis can\'t be instantiated!');
     }
   });
 
