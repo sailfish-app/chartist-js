@@ -432,7 +432,11 @@ declare namespace Chartist {
                 showArea?: boolean;
                 areaBase?: number;
             }
-        }
+        };
+        band?: {
+            top: string;
+            bottom: string;
+        };
     }
 
     interface ILineChartAxis {

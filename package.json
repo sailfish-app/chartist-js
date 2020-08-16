@@ -2,7 +2,7 @@
   "name": "@sailfish-app/chartist",
   "title": "Chartist.js",
   "description": "Simple, responsive charts",
-  "version": "0.11.9",
+  "version": "0.11.10",
   "author": "Gion Kunz",
   "homepage": "https://gionkunz.github.io/chartist-js",
   "repository": {
@@ -42,7 +42,9 @@
       "url": "https://github.com/gionkunz/chartist-js/blob/master/LICENSE-MIT"
     }
   ],
-  "dependencies": {},
+  "dependencies": {
+    "kld-intersections": "^0.7.0"
+  },
   "devDependencies": {
     "assemble-dox": "0.0.2",
     "dtslint": "^3.6.14",
