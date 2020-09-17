@@ -109,12 +109,16 @@
   Chartist.Axis = Chartist.Class.extend({
     constructor: Axis,
     createGridAndLabels: createGridAndLabels,
-    projectValue: function(value, index, data) {
-      throw new Error('Base axis can\'t be instantiated!');
+    projectValue: function (value, index, data) {
+      throw new Error("Base axis can't be instantiated!");
     },
-    invert: function() {
-      throw new Error('Base axis can\'t be instantiated!');
-    }
+    invert: function invert(coord) {
+      const percent =
+        (coord - this.chartRect[this.units.rectStart]) / this.axisLength;
+      const value =
+        percent * (this.range.max - this.range.min) + this.range.min;
+      return value;
+    },
   });
 
   Chartist.Axis.units = axisUnits;
